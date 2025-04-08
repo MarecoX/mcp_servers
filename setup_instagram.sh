@@ -134,6 +134,54 @@ const schemas = {
     get_comment_ids: z.object({
       media_id: z.string(),
     }),
+    track_hashtag: z.object({
+      hashtag: z.string(),
+      days: z.number().optional()
+    }),
+    user_insights: z.object({
+      metrics: z.array(z.string().enum(["age","gender","location","activity"])),
+      period: z.string().enum(["day","week","month"]).optional()
+    }),
+    send_dm: z.object({
+      recipientId: z.string(),
+      text: z.string().optional(),
+      mediaUrl: z.string().optional(),
+      mediaType: z.string().optional().enum(["image", "video", "audio"]),
+      link: z.string().optional()
+    }),
+    schedule_post: z.object({
+      mediaUrl: z.string(),
+      caption: z.string(),
+      publishTime: z.string().format("date-time")
+    }),
+    post_analytics: z.object({
+      mediaId: z.string(),
+      metrics: z.array(z.string().enum(["likes","comments","reach","impressions","saves","shares"]))
+    }),
+    send_image: z.object({
+      recipientId: z.string(),
+      imageUrl: z.string(),
+      caption: z.string().optional()
+    }),
+    send_media: z.object({
+      recipientId: z.string(),
+      mediaUrl: z.string(),
+      mediaType: z.string().enum(["audio", "video"]),
+      caption: z.string().optional()
+    }),
+    send_sticker: z.object({
+      recipientId: z.string()
+    }),
+    react_message: z.object({
+      recipientId: z.string(),
+      messageId: z.string(),
+      action: z.string().enum(["react", "unreact"]),
+      reaction: z.string().optional()
+    }),
+    share_post: z.object({
+      recipientId: z.string(),
+      postId: z.string()
+    }),
   },
 };
 
@@ -340,6 +388,143 @@ const TOOL_DEFINITIONS = [
       required: ["media_id"],
     },
   },
+  {
+    name: "track_hashtag",
+    description: "Monitor hashtag performance metrics",
+    inputSchema: {
+      type: "object",
+      properties: {
+        hashtag: { type: "string", description: "Hashtag a ser monitorada" },
+        days: { type: "number", description: "Número de dias para monitorar (opcional)" }
+      },
+      required: ["hashtag"]
+    }
+  },
+  {
+    name: "user_insights",
+    description: "Get follower demographics and activity",
+    inputSchema: {
+      type: "object",
+      properties: {
+        metrics: { 
+          type: "array",
+          items: { type: "string" },
+          description: "Lista de métricas a serem coletadas"
+        },
+        period: { type: "string", description: "Período de tempo para coletar métricas (opcional)" }
+      }
+    }
+  },
+  {
+    name: "send_dm",
+    description: "Envia mensagem direta para usuário do Instagram",
+    inputSchema: {
+      type: "object",
+      properties: {
+        recipientId: { type: "string", description: "Instagram-scoped ID (IGSID) do destinatário" },
+        text: { type: "string", description: "Texto da mensagem (opcional)" },
+        mediaUrl: { type: "string", description: "URL da mídia a ser enviada (opcional)" },
+        mediaType: { type: "string", enum: ["image", "video", "audio"], description: "Tipo de mídia (opcional)" },
+        link: { type: "string", description: "Link para incluir na mensagem (opcional)" }
+      },
+      required: ["recipientId"]
+    }
+  },
+  {
+    name: "schedule_post",
+    description: "Schedule post for future publishing",
+    inputSchema: {
+      type: "object",
+      properties: {
+        mediaUrl: { type: "string", description: "URL da mídia a ser publicada" },
+        caption: { type: "string", description: "Legenda da publicação" },
+        publishTime: { type: "string", description: "Data e hora de publicação (formato ISO 8601)" }
+      },
+      required: ["mediaUrl","publishTime"]
+    }
+  },
+  {
+    name: "post_analytics",
+    description: "Get engagement metrics for a post",
+    inputSchema: {
+      type: "object",
+      properties: {
+        mediaId: { type: "string", description: "ID da publicação" },
+        metrics: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: ["likes","comments","reach","impressions","saves","shares"]
+          }
+        }
+      },
+      required: ["mediaId"]
+    }
+  },
+  {
+    name: "send_image",
+    description: "Envia uma imagem ou GIF para um usuário do Instagram",
+    inputSchema: {
+      type: "object",
+      properties: {
+        recipientId: { type: "string", description: "Instagram-scoped ID (IGSID) do destinatário" },
+        imageUrl: { type: "string", description: "URL da imagem ou GIF a ser enviada" },
+        caption: { type: "string", description: "Texto opcional para acompanhar a imagem" }
+      },
+      required: ["recipientId", "imageUrl"]
+    }
+  },
+  {
+    name: "send_media",
+    description: "Envia áudio ou vídeo para um usuário do Instagram",
+    inputSchema: {
+      type: "object",
+      properties: {
+        recipientId: { type: "string", description: "Instagram-scoped ID (IGSID) do destinatário" },
+        mediaUrl: { type: "string", description: "URL do arquivo de áudio ou vídeo" },
+        mediaType: { type: "string", enum: ["audio", "video"], description: "Tipo de mídia (audio ou video)" },
+        caption: { type: "string", description: "Texto opcional para acompanhar a mídia" }
+      },
+      required: ["recipientId", "mediaUrl", "mediaType"]
+    }
+  },
+  {
+    name: "send_sticker",
+    description: "Envia um sticker de coração para um usuário do Instagram",
+    inputSchema: {
+      type: "object",
+      properties: {
+        recipientId: { type: "string", description: "Instagram-scoped ID (IGSID) do destinatário" }
+      },
+      required: ["recipientId"]
+    }
+  },
+  {
+    name: "react_message",
+    description: "Reage ou remove reação a uma mensagem no Instagram",
+    inputSchema: {
+      type: "object",
+      properties: {
+        recipientId: { type: "string", description: "Instagram-scoped ID (IGSID) do destinatário" },
+        messageId: { type: "string", description: "ID da mensagem para reagir" },
+        action: { type: "string", enum: ["react", "unreact"], description: "Ação a ser realizada (reagir ou remover reação)" },
+        reaction: { type: "string", description: "Tipo de reação (opcional)" }
+      },
+      required: ["recipientId", "messageId", "action"]
+    }
+  },
+  {
+    name: "share_post",
+    description: "Compartilha um post do Instagram com um usuário",
+    inputSchema: {
+      type: "object",
+      properties: {
+        recipientId: { type: "string", description: "Instagram-scoped ID (IGSID) do destinatário" },
+        postId: { type: "string", description: "ID do post a ser compartilhado" }
+      },
+      required: ["recipientId", "postId"]
+    }
+  }
 ];
 
 const toolHandlers = {
@@ -697,9 +882,9 @@ const toolHandlers = {
 
         console.log("\n🔄 Iniciando verificação de status do carrossel...");
         console.log("⏱️ Configuração de tempo:");
-        console.log(`- Intervalo entre verificações: ${interval/1000} segundos`);
-        console.log(`- Número máximo de tentativas: ${maxAttempts}`);
-        console.log(`- Tempo total máximo: ${(maxAttempts * interval)/1000} segundos`);
+        console.log("- Intervalo entre verificações: 30 segundos");
+        console.log("- Número máximo de tentativas: 2");
+        console.log("- Tempo total máximo: 60 segundos");
 
         while (status === "IN_PROGRESS" && attempts < maxAttempts) {
           const statusUrl = `${baseUrl}/${apiVersion}/${containerId}`;
@@ -1812,6 +1997,621 @@ const toolHandlers = {
       };
     }
   },
+  track_hashtag: async (args) => {
+    const parsed = schemas.toolInputs.track_hashtag.parse(args);
+    console.log("🔍 Tracking hashtag:", parsed.hashtag);
+    
+    try {
+      const response = await axios.get(`${baseUrl}/${apiVersion}/${igUserId}/tags/search`, {
+        params: {
+          q: parsed.hashtag,
+          access_token: accessToken
+        }
+      });
+      
+      return {
+        hashtag: parsed.hashtag,
+        data: response.data.data
+      };
+    } catch (error) {
+      console.error("❌ Error tracking hashtag:", error);
+      throw error;
+    }
+  },
+  
+  user_insights: async (args) => {
+    const parsed = schemas.toolInputs.user_insights.parse(args);
+    
+    try {
+      const response = await axios.get(`${baseUrl}/${apiVersion}/${igUserId}/insights`, {
+        params: {
+          metric: parsed.metrics.join(','),
+          period: parsed.period,
+          access_token: accessToken
+        }
+      });
+      
+      return response.data.data;
+    } catch (error) {
+      console.error("❌ Error getting user insights:", error);
+      throw error;
+    }
+  },
+  
+  send_dm: async (args) => {
+    const parsed = schemas.toolInputs.send_dm.parse(args);
+    
+    try {
+      // Verificar se temos o ID do destinatário
+      if (!parsed.recipientId) {
+        throw new Error("ID do destinatário (IGSID) é obrigatório");
+      }
+      
+      // Construir o objeto de mensagem
+      const messageObj = {};
+      
+      // Adicionar texto se fornecido
+      if (parsed.text) {
+        // Verificar tamanho do texto (máximo 1000 bytes)
+        const textBytes = Buffer.from(parsed.text, 'utf8').length;
+        if (textBytes > 1000) {
+          throw new Error("Texto excede o limite de 1000 bytes");
+        }
+        messageObj.text = parsed.text;
+      }
+      
+      // Adicionar link se fornecido
+      if (parsed.link) {
+        // Verificar se é uma URL válida
+        try {
+          new URL(parsed.link);
+        } catch (e) {
+          throw new Error("O link fornecido não é uma URL válida");
+        }
+        
+        // Se já tiver texto, adiciona o link ao final
+        if (messageObj.text) {
+          messageObj.text += "\n" + parsed.link;
+        } else {
+          messageObj.text = parsed.link;
+        }
+      }
+      
+      // Adicionar mídia se fornecida
+      if (parsed.mediaUrl) {
+        if (!parsed.mediaType) {
+          throw new Error("mediaType é obrigatório quando mediaUrl é fornecido");
+        }
+        
+        // Verificar tipo de mídia e definir o formato correto
+        let attachmentType;
+        switch(parsed.mediaType) {
+          case "image":
+            attachmentType = "image";
+            // Verificar formato da imagem (png, jpeg, gif)
+            if (!parsed.mediaUrl.match(/\.(png|jpe?g|gif)$/i)) {
+              console.warn("⚠️ Aviso: URL da imagem não parece ter um formato suportado (png, jpeg, gif)");
+            }
+            break;
+          case "video":
+            attachmentType = "video";
+            // Verificar formato do vídeo (mp4, ogg, avi, mov, webm)
+            if (!parsed.mediaUrl.match(/\.(mp4|ogg|avi|mov|webm)$/i)) {
+              console.warn("⚠️ Aviso: URL do vídeo não parece ter um formato suportado (mp4, ogg, avi, mov, webm)");
+            }
+            break;
+          case "audio":
+            attachmentType = "audio";
+            // Verificar formato do áudio (aac, m4a, wav, mp4)
+            if (!parsed.mediaUrl.match(/\.(aac|m4a|wav|mp4)$/i)) {
+              console.warn("⚠️ Aviso: URL do áudio não parece ter um formato suportado (aac, m4a, wav, mp4)");
+            }
+            break;
+          default:
+            throw new Error("mediaType deve ser 'image', 'video' ou 'audio'");
+        }
+        
+        // Adicionar attachment conforme o tipo de mídia
+        messageObj.attachment = {
+          type: attachmentType,
+          payload: {
+            url: parsed.mediaUrl
+          }
+        };
+      }
+      
+      // Verificar se há conteúdo para enviar
+      if (Object.keys(messageObj).length === 0) {
+        throw new Error("É necessário fornecer texto, link ou mídia para enviar");
+      }
+      
+      // Construir payload completo conforme documentação
+      const payload = {
+        recipient: { id: parsed.recipientId },
+        message: messageObj
+      };
+      
+      console.log("📤 Enviando mensagem para:", parsed.recipientId);
+      console.log("📝 Conteúdo:", JSON.stringify(messageObj, null, 2));
+      
+      // Fazer requisição à API do Instagram conforme documentação
+      const url = `${baseUrl}/${apiVersion}/${igUserId}/messages`;
+      console.log("🔗 URL da API:", url);
+      
+      const response = await axios({
+        method: 'post',
+        url: url,
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        data: payload
+      });
+      
+      console.log("✅ Mensagem enviada com sucesso!");
+      console.log("📊 Resposta da API:", response.data);
+      
+      return {
+        success: true,
+        messageId: response.data.message_id,
+        recipientId: parsed.recipientId
+      };
+    } catch (error) {
+      console.error("❌ Erro ao enviar mensagem:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      return {
+        success: false,
+        error: error.message,
+        details: error.response?.data
+      };
+    }
+  },
+  
+  schedule_post: async (args) => {
+    const parsed = schemas.toolInputs.schedule_post.parse(args);
+    
+    try {
+      // First create media container
+      const createResponse = await axios.post(`${baseUrl}/${apiVersion}/${igUserId}/media`, {
+        media_url: parsed.mediaUrl,
+        caption: parsed.caption,
+        is_carousel_item: false,
+        scheduled_publish_time: Math.floor(new Date(parsed.publishTime).getTime() / 1000)
+      }, { params: { access_token: accessToken } });
+      
+      return { 
+        scheduled: true, 
+        mediaId: createResponse.data.id,
+        publishTime: parsed.publishTime 
+      };
+    } catch (error) {
+      console.error("❌ Error scheduling post:", error);
+      throw error;
+    }
+  },
+  
+  post_analytics: async (args) => {
+    const parsed = schemas.toolInputs.post_analytics.parse(args);
+    
+    try {
+      const response = await axios.get(`${baseUrl}/${apiVersion}/${parsed.mediaId}/insights`, {
+        params: {
+          metric: parsed.metrics?.join(','),
+          access_token: accessToken
+        }
+      });
+      
+      return response.data.data;
+    } catch (error) {
+      console.error("❌ Error getting post analytics:", error);
+      throw error;
+    }
+  },
+  send_image: async (args) => {
+    const parsed = schemas.toolInputs.send_image.parse(args);
+    console.log("🔐 Variáveis de ambiente utilizadas:");
+    console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
+    console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
+    
+    const igUserId = process.env.INSTAGRAM_USER_ID;
+    const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
+    const apiVersion = "v22.0";
+    const baseUrl = "https://graph.instagram.com";
+
+    try {
+      // Verificar se o URL da imagem é válido
+      try {
+        new URL(parsed.imageUrl);
+      } catch (e) {
+        throw new Error("URL da imagem inválido");
+      }
+      
+      // Verificar formato da imagem
+      if (!parsed.imageUrl.match(/\.(png|jpe?g|gif)$/i)) {
+        console.warn("⚠️ Aviso: URL da imagem não parece ter um formato suportado (png, jpeg, gif)");
+      }
+      
+      // Construir o payload da mensagem
+      const messageObj = {
+        attachment: {
+          type: "image",
+          payload: {
+            url: parsed.imageUrl
+          }
+        }
+      };
+      
+      // Adicionar caption se fornecido
+      if (parsed.caption) {
+        // Enviar em uma mensagem separada para garantir compatibilidade
+        try {
+          const captionPayload = {
+            recipient: { id: parsed.recipientId },
+            message: { text: parsed.caption }
+          };
+          
+          await axios({
+            method: 'post',
+            url: `${baseUrl}/${apiVersion}/${igUserId}/messages`,
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            data: captionPayload
+          });
+          
+          console.log("✅ Legenda enviada com sucesso!");
+        } catch (captionError) {
+          console.warn("⚠️ Erro ao enviar legenda:", captionError.message);
+        }
+      }
+      
+      // Construir payload completo
+      const payload = {
+        recipient: { id: parsed.recipientId },
+        message: messageObj
+      };
+      
+      console.log("📤 Enviando imagem para:", parsed.recipientId);
+      console.log("🖼️ URL da imagem:", parsed.imageUrl);
+      
+      // Fazer requisição à API do Instagram
+      const url = `${baseUrl}/${apiVersion}/${igUserId}/messages`;
+      const response = await axios({
+        method: 'post',
+        url: url,
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        data: payload
+      });
+      
+      console.log("✅ Imagem enviada com sucesso!");
+      return {
+        success: true,
+        messageId: response.data.message_id,
+        recipientId: parsed.recipientId
+      };
+    } catch (error) {
+      console.error("❌ Erro ao enviar imagem:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      return {
+        success: false,
+        error: error.message,
+        details: error.response?.data
+      };
+    }
+  },
+  
+  send_media: async (args) => {
+    const parsed = schemas.toolInputs.send_media.parse(args);
+    console.log("🔐 Variáveis de ambiente utilizadas:");
+    console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
+    console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
+    
+    const igUserId = process.env.INSTAGRAM_USER_ID;
+    const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
+    const apiVersion = "v22.0";
+    const baseUrl = "https://graph.instagram.com";
+
+    try {
+      // Verificar se o URL da mídia é válido
+      try {
+        new URL(parsed.mediaUrl);
+      } catch (e) {
+        throw new Error("URL da mídia inválido");
+      }
+      
+      // Verificar tipo de mídia e formato
+      if (parsed.mediaType === "audio") {
+        if (!parsed.mediaUrl.match(/\.(aac|m4a|wav|mp4)$/i)) {
+          console.warn("⚠️ Aviso: URL do áudio não parece ter um formato suportado (aac, m4a, wav, mp4)");
+        }
+      } else if (parsed.mediaType === "video") {
+        if (!parsed.mediaUrl.match(/\.(mp4|ogg|avi|mov|webm)$/i)) {
+          console.warn("⚠️ Aviso: URL do vídeo não parece ter um formato suportado (mp4, ogg, avi, mov, webm)");
+        }
+      } else {
+        throw new Error("Tipo de mídia deve ser 'audio' ou 'video'");
+      }
+      
+      // Construir o payload da mensagem
+      const messageObj = {
+        attachment: {
+          type: parsed.mediaType,
+          payload: {
+            url: parsed.mediaUrl
+          }
+        }
+      };
+      
+      // Adicionar caption se fornecido
+      if (parsed.caption) {
+        // Enviar em uma mensagem separada para garantir compatibilidade
+        try {
+          const captionPayload = {
+            recipient: { id: parsed.recipientId },
+            message: { text: parsed.caption }
+          };
+          
+          await axios({
+            method: 'post',
+            url: `${baseUrl}/${apiVersion}/${igUserId}/messages`,
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            data: captionPayload
+          });
+          
+          console.log("✅ Legenda enviada com sucesso!");
+        } catch (captionError) {
+          console.warn("⚠️ Erro ao enviar legenda:", captionError.message);
+        }
+      }
+      
+      // Construir payload completo
+      const payload = {
+        recipient: { id: parsed.recipientId },
+        message: messageObj
+      };
+      
+      console.log(`📤 Enviando ${parsed.mediaType === "audio" ? "áudio" : "vídeo"} para:`, parsed.recipientId);
+      console.log("🔗 URL da mídia:", parsed.mediaUrl);
+      
+      // Fazer requisição à API do Instagram
+      const url = `${baseUrl}/${apiVersion}/${igUserId}/messages`;
+      const response = await axios({
+        method: 'post',
+        url: url,
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        data: payload
+      });
+      
+      console.log(`✅ ${parsed.mediaType === "audio" ? "Áudio" : "Vídeo"} enviado com sucesso!`);
+      return {
+        success: true,
+        messageId: response.data.message_id,
+        recipientId: parsed.recipientId
+      };
+    } catch (error) {
+      console.error(`❌ Erro ao enviar ${parsed.mediaType === "audio" ? "áudio" : "vídeo"}:`, {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      return {
+        success: false,
+        error: error.message,
+        details: error.response?.data
+      };
+    }
+  },
+  
+  send_sticker: async (args) => {
+    const parsed = schemas.toolInputs.send_sticker.parse(args);
+    console.log("🔐 Variáveis de ambiente utilizadas:");
+    console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
+    console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
+    
+    const igUserId = process.env.INSTAGRAM_USER_ID;
+    const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
+    const apiVersion = "v22.0";
+    const baseUrl = "https://graph.instagram.com";
+
+    try {
+      // Construir o payload da mensagem com sticker de coração
+      const messageObj = {
+        attachment: {
+          type: "like_heart"
+        }
+      };
+      
+      // Construir payload completo
+      const payload = {
+        recipient: { id: parsed.recipientId },
+        message: messageObj
+      };
+      
+      console.log("📤 Enviando sticker de coração para:", parsed.recipientId);
+      
+      // Fazer requisição à API do Instagram
+      const url = `${baseUrl}/${apiVersion}/${igUserId}/messages`;
+      const response = await axios({
+        method: 'post',
+        url: url,
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        data: payload
+      });
+      
+      console.log("✅ Sticker enviado com sucesso!");
+      return {
+        success: true,
+        messageId: response.data.message_id,
+        recipientId: parsed.recipientId
+      };
+    } catch (error) {
+      console.error("❌ Erro ao enviar sticker:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      return {
+        success: false,
+        error: error.message,
+        details: error.response?.data
+      };
+    }
+  },
+  
+  react_message: async (args) => {
+    const parsed = schemas.toolInputs.react_message.parse(args);
+    console.log("🔐 Variáveis de ambiente utilizadas:");
+    console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
+    console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
+    
+    const igUserId = process.env.INSTAGRAM_USER_ID;
+    const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
+    const apiVersion = "v22.0";
+    const baseUrl = "https://graph.instagram.com";
+
+    try {
+      // Construir payload para reação
+      const payload = {
+        recipient: { id: parsed.recipientId },
+        sender_action: parsed.action,
+        payload: {
+          message_id: parsed.messageId
+        }
+      };
+      
+      // Adicionar reaction apenas se for uma ação de reagir
+      if (parsed.action === "react") {
+        if (!parsed.reaction) {
+          // Padrão para 'love' se não especificado
+          payload.payload.reaction = "love";
+        } else {
+          payload.payload.reaction = parsed.reaction;
+        }
+      }
+      
+      console.log(`📤 ${parsed.action === "react" ? "Reagindo a" : "Removendo reação de"} mensagem:`, parsed.messageId);
+      
+      // Fazer requisição à API do Instagram
+      const url = `${baseUrl}/${apiVersion}/${igUserId}/messages`;
+      const response = await axios({
+        method: 'post',
+        url: url,
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        data: payload
+      });
+      
+      console.log(`✅ ${parsed.action === "react" ? "Reação" : "Remoção de reação"} realizada com sucesso!`);
+      return {
+        success: true,
+        action: parsed.action,
+        messageId: parsed.messageId,
+        recipientId: parsed.recipientId
+      };
+    } catch (error) {
+      console.error(`❌ Erro ao ${parsed.action === "react" ? "reagir à" : "remover reação da"} mensagem:`, {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      return {
+        success: false,
+        error: error.message,
+        details: error.response?.data
+      };
+    }
+  },
+  
+  share_post: async (args) => {
+    const parsed = schemas.toolInputs.share_post.parse(args);
+    console.log("🔐 Variáveis de ambiente utilizadas:");
+    console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
+    console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
+    
+    const igUserId = process.env.INSTAGRAM_USER_ID;
+    const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
+    const apiVersion = "v22.0";
+    const baseUrl = "https://graph.instagram.com";
+
+    try {
+      // Construir o payload da mensagem com o post compartilhado
+      const messageObj = {
+        attachment: {
+          type: "MEDIA_SHARE",
+          payload: {
+            id: parsed.postId
+          }
+        }
+      };
+      
+      // Construir payload completo
+      const payload = {
+        recipient: { id: parsed.recipientId },
+        message: messageObj
+      };
+      
+      console.log("📤 Compartilhando post com:", parsed.recipientId);
+      console.log("🆔 ID do post:", parsed.postId);
+      
+      // Fazer requisição à API do Instagram
+      const url = `${baseUrl}/${apiVersion}/${igUserId}/messages`;
+      const response = await axios({
+        method: 'post',
+        url: url,
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        data: payload
+      });
+      
+      console.log("✅ Post compartilhado com sucesso!");
+      return {
+        success: true,
+        messageId: response.data.message_id,
+        recipientId: parsed.recipientId,
+        postId: parsed.postId
+      };
+    } catch (error) {
+      console.error("❌ Erro ao compartilhar post:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      return {
+        success: false,
+        error: error.message,
+        details: error.response?.data
+      };
+    }
+  }
 };
 
 const server = new Server({
@@ -1847,3 +2647,5 @@ async function main() {
 }
 
 main().catch(console.error);
+
+```
