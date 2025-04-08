@@ -1,4 +1,4 @@
-# ABC MCP Installer
+# MarecoX MCP Servers
 
 Script de instalação automatizada para servidores MCP.
 
@@ -17,13 +17,13 @@ Você pode instalar de duas maneiras:
 
 ### Opção 1 - Comando em uma linha (Recomendado)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ABCMilioli/install-mcp/main/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/MarecoX/mcp_servers/main/install.sh | sudo bash
 ```
 
 ### Opção 2 - Comandos separados
 ```bash
 # 1. Baixar o script de instalação
-curl -fsSL https://raw.githubusercontent.com/ABCMilioli/install-mcp/main/install.sh > install.sh
+curl -fsSL https://raw.githubusercontent.com/MarecoX/mcp_servers/main/install.sh > install.sh
 
 # 2. Executar o script com privilégios de root
 sudo bash install.sh
@@ -116,4 +116,4 @@ O script irá:
 
 ## Suporte
 
-Para suporte, abra uma issue no repositório: https://github.com/ABCMilioli/install-mcp/issues 
+Para suporte, abra uma issue no repositório: https://github.com/MarecoX/mcp_servers/issues 

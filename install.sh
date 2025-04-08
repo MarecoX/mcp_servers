@@ -15,16 +15,54 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Banner
-echo -e "
-██████╗ ██████╗  ██████╗    ███╗   ███╗ ██████╗██████╗ 
-██╔══██╗██╔══██╗██╔════╝    ████╗ ████║██╔════╝██╔══██╗
-██████║██████╔╝██║         ██╔████╔██║██║     ██████╔╝
-██╔══██╗██╔══██╗██║         ██║╚██╔╝██║██║     ██╔═══╝
-██║  ██║██████╔╝╚██████╗    ██║ ╚═╝ ██║╚██████╗██║  
-╚═╝  ╚═╝╚═════╝  ╚═════╝    ╚═╝     ╚═╝ ╚═════╝╚═╝  
-                                                                              
-               Auto Instalador do ABC MCP
-               Criado por Robson Milioli
+echo -e "${amarelo}
+                      ▄▄▄▄▄▄▄▄▄▄▄
+                    ▄█████████████▄
+                   ████▀  ▀████▀  ▀█
+                  ███     ████     █
+                  ██     ▄████▄    █
+                  ██    ████████   █
+                  ██   ▄████████▄  █
+                  ███ ▄███▀  ▀███▄ █
+                   ██ ███      ███ █
+                   ██ ███      ███ █
+                   ██ ▀███▄  ▄███▀ █
+                   ██▄ ▀████████▀ ▄█
+                    ██▄  ▀████▀  ▄██
+                    ▀███▄▄▄██▄▄▄███▀
+                      ▀▀█████████▀▀
+                  ▄▄██▀▀▀     ▀▀▀██▄▄
+                ▄██▀               ▀██▄
+               ███                   ███
+              ███                     ███
+             ███                       ███
+             ███       ▄▄█████▄▄       ███
+             ███     ▄███▀▀▀▀▀███▄     ███
+             ███    ████▄     ▄████    ███
+             ███    █████     █████    ███
+             ███    █████     █████    ███
+             ███    ████▀     ▀████    ███
+             ███     ▀███▄▄▄▄▄███▀     ███
+             ███       ▀▀█████▀▀       ███
+              ███                     ███
+               ███                   ███
+                ▀██▄               ▄██▀
+                  ▀▀██▄▄▄     ▄▄▄██▀▀
+                      ▀▀█████████▀▀${reset}
+
+${verde}  ███▄ ▄███▓ ▄▄▄       ██▀███  ▓█████  ▄████▄   ▒█████  ▒██   ██▒${reset}
+${verde}  ▓██▒▀█▀ ██▒▒████▄    ▓██ ▒ ██▒▓█   ▀ ▒██▀ ▀█  ▒██▒  ██▒▒▒ █ █ ▒░${reset}
+${verde}  ▓██    ▓██░▒██  ▀█▄  ▓██ ░▄█ ▒▒███   ▒▓█    ▄ ▒██░  ██▒░░  █   ░${reset}
+${verde}  ▒██    ▒██ ░██▄▄▄▄██ ▒██▀▀█▄  ▒▓█  ▄ ▒▓▓▄ ▄██▒▒██   ██░ ░ █ █ ▒ ${reset}
+${verde}  ▒██▒   ░██▒ ▓█   ▓██▒░██▓ ▒██▒░▒████▒▒ ▓███▀ ░░ ████▓▒░▒██▒ ▒██▒${reset}
+${verde}  ░ ▒░   ░  ░ ▒▒   ▓▒█░░ ▒▓ ░▒▓░░░ ▒░ ░░ ░▒ ▒  ░░ ▒░▒░▒░ ▒▒ ░ ░▓ ░${reset}
+${verde}  ░  ░      ░  ▒   ▒▒ ░  ░▒ ░ ▒░ ░ ░  ░  ░  ▒     ░ ▒ ▒░ ░░   ░▒ ░${reset}
+${verde}  ░      ░     ░   ▒     ░░   ░    ░   ░        ░ ░ ░ ▒   ░    ░  ${reset}
+${verde}         ░         ░  ░   ░        ░  ░░ ░          ░ ░   ░    ░  ${reset}
+${verde}                                       ░                          ${reset}
+
+${azul}                  MCP PROTOCOL SERVERS${reset}
+${amarelo}                  Criado por MarecoX${reset}
 "
 
 # 1. Mostra as opções disponíveis
@@ -50,7 +88,7 @@ else
         read -p "> " opcao < /dev/tty
     else
         echo -e "${amarelo}Por favor, execute o script diretamente:${reset}"
-        echo -e "${verde}curl -fsSL https://raw.githubusercontent.com/ABCMilioli/install-mcp/main/install.sh > install.sh${reset}"
+        echo -e "${verde}curl -fsSL https://raw.githubusercontent.com/MarecoX/mcp_servers/main/install.sh > install.sh${reset}"
         echo -e "${verde}sudo bash install.sh${reset}"
         exit 1
     fi
@@ -60,7 +98,7 @@ fi
 if [[ ! "$opcao" =~ ^[1-4]$ ]]; then
     echo -e "${vermelho}Opção inválida!${reset}"
     echo -e "${amarelo}Por favor, execute o script novamente usando:${reset}"
-    echo -e "${verde}curl -fsSL https://raw.githubusercontent.com/ABCMilioli/install-mcp/main/install.sh > install.sh${reset}"
+    echo -e "${verde}curl -fsSL https://raw.githubusercontent.com/MarecoX/mcp_servers/main/install.sh > install.sh${reset}"
     echo -e "${verde}sudo bash install.sh${reset}"
     exit 1
 fi
@@ -68,11 +106,11 @@ fi
 # 4. Processamento da escolha
 case $opcao in
     1)
-        echo -e "${azul}Iniciando instalação do ABC MCP Google Calendar...${reset}"
+        echo -e "${azul}Iniciando instalação do MarecoX MCP Google Calendar...${reset}"
         echo -e "${amarelo}Baixando script de configuração...${reset}"
         
         # Baixar o script setup.sh
-        curl -fsSL https://raw.githubusercontent.com/ABCMilioli/install-mcp/main/setup_google.sh -o setup_google.sh
+        curl -fsSL https://raw.githubusercontent.com/MarecoX/mcp_servers/main/setup_google.sh -o setup_google.sh
         
         if [ $? -eq 0 ]; then
             echo -e "${verde}Script baixado com sucesso!${reset}"
@@ -88,7 +126,7 @@ case $opcao in
         echo -e "${amarelo}Baixando script de configuração...${reset}"
         
         # Baixar o script setup.sh
-        curl -fsSL https://raw.githubusercontent.com/ABCMilioli/install-mcp/main/setup_evolution.sh -o setup_evolution.sh
+        curl -fsSL https://raw.githubusercontent.com/MarecoX/mcp_servers/main/setup_evolution.sh -o setup_evolution.sh
         
         if [ $? -eq 0 ]; then
             echo -e "${verde}Script baixado com sucesso!${reset}"
@@ -104,7 +142,7 @@ case $opcao in
         echo -e "${amarelo}Baixando script de configuração...${reset}"
         
         # Baixar o script setup.sh
-        curl -fsSL https://raw.githubusercontent.com/ABCMilioli/install-mcp/main/setup_instagram.sh -o setup_instagram.sh
+        curl -fsSL https://raw.githubusercontent.com/MarecoX/mcp_servers/main/setup_instagram.sh -o setup_instagram.sh
         
         if [ $? -eq 0 ]; then
             echo -e "${verde}Script baixado com sucesso!${reset}"
