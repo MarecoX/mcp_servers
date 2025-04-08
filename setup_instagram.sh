@@ -51,7 +51,7 @@ npm install dotenv axios zod @modelcontextprotocol/sdk
 
 # Criar arquivo index.js
 echo -e "${YELLOW}Criando arquivo index.js...${NC}"
-cat > index.js << 'EOL'
+cat > index2.js << 'EOL'
 const { Server } = require("@modelcontextprotocol/sdk/server/index.js");
 const { StdioServerTransport } = require("@modelcontextprotocol/sdk/server/stdio.js");
 const { CallToolRequestSchema, ListToolsRequestSchema } = require("@modelcontextprotocol/sdk/types.js");
