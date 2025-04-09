@@ -51,7 +51,7 @@ npm install dotenv axios zod @modelcontextprotocol/sdk
 
 # Criar arquivo index.js
 echo -e "${YELLOW}Criando arquivo index.js...${NC}"
-cat > index.js << 'EOL'
+cat > index2.js << 'EOL'
 const { Server } = require("@modelcontextprotocol/sdk/server/index.js");
 const { StdioServerTransport } = require("@modelcontextprotocol/sdk/server/stdio.js");
 const { CallToolRequestSchema, ListToolsRequestSchema } = require("@modelcontextprotocol/sdk/types.js");
@@ -139,24 +139,26 @@ const schemas = {
       days: z.number().optional()
     }),
     user_insights: z.object({
-      metrics: z.array(z.string().enum(["age","gender","location","activity"])),
-      period: z.string().enum(["day","week","month"]).optional()
+      metrics: z.enum(["age", "gender", "location", "activity"]).array(),
+      period: z.enum(["day", "week", "month"]).optional()
     }),
     send_dm: z.object({
       recipientId: z.string(),
       text: z.string().optional(),
       mediaUrl: z.string().optional(),
-      mediaType: z.string().optional().enum(["image", "video", "audio"]),
+      mediaType: z.enum(["image", "video", "audio"]).optional(),
       link: z.string().optional()
     }),
     schedule_post: z.object({
       mediaUrl: z.string(),
       caption: z.string(),
-      publishTime: z.string().format("date-time")
+      publishTime: z.string().refine(val => !isNaN(Date.parse(val)), {
+        message: "Invalid datetime format"
+      })
     }),
     post_analytics: z.object({
       mediaId: z.string(),
-      metrics: z.array(z.string().enum(["likes","comments","reach","impressions","saves","shares"]))
+      metrics: z.enum(["likes", "comments", "reach", "impressions", "saves", "shares"]).array()
     }),
     send_image: z.object({
       recipientId: z.string(),
@@ -166,7 +168,7 @@ const schemas = {
     send_media: z.object({
       recipientId: z.string(),
       mediaUrl: z.string(),
-      mediaType: z.string().enum(["audio", "video"]),
+      mediaType: z.enum(["audio", "video"]),
       caption: z.string().optional()
     }),
     send_sticker: z.object({
@@ -175,7 +177,7 @@ const schemas = {
     react_message: z.object({
       recipientId: z.string(),
       messageId: z.string(),
-      action: z.string().enum(["react", "unreact"]),
+      action: z.enum(["react", "unreact"]),
       reaction: z.string().optional()
     }),
     share_post: z.object({
@@ -184,6 +186,7 @@ const schemas = {
     }),
   },
 };
+
 
 const TOOL_DEFINITIONS = [
   {
@@ -2647,5 +2650,3 @@ async function main() {
 }
 
 main().catch(console.error);
-
-```
