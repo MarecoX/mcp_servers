@@ -51,7 +51,7 @@ npm install dotenv axios zod @modelcontextprotocol/sdk
 
 # Criar arquivo index.js
 echo -e "${YELLOW}Criando arquivo index.js...${NC}"
-cat > index2.js << 'EOL'
+cat > index.js << 'EOL'
 const { Server } = require("@modelcontextprotocol/sdk/server/index.js");
 const { StdioServerTransport } = require("@modelcontextprotocol/sdk/server/stdio.js");
 const { CallToolRequestSchema, ListToolsRequestSchema } = require("@modelcontextprotocol/sdk/types.js");
@@ -63,19 +63,19 @@ dotenv.config();
 
 const schemas = {
   toolInputs: {
-    media: z.object({      
+    media: z.object({
       imageUrl: z.string().url(),
       caption: z.string(),
       altText: z.string().optional(),
     }),
-    media_publish: z.object({      
+    media_publish: z.object({
       creation_id: z.string(),
     }),
-    carousel_item: z.object({      
+    carousel_item: z.object({
       imageUrl: z.string().url(),
       is_carousel_item: z.literal(true),
     }),
-    carousel: z.object({      
+    carousel: z.object({
       items: z.array(z.string().url()).min(1).max(10),
       caption: z.string(),
       collaborators: z.array(z.string()).optional(),
@@ -86,13 +86,13 @@ const schemas = {
         y: z.number()
       })).optional(),
     }),
-    reel: z.object({      
+    reel: z.object({
       videoUrl: z.string().url(),
       caption: z.string(),
       coverUrl: z.string().url().optional(),
       shareToFeed: z.boolean().optional(),
     }),
-    story: z.object({      
+    story: z.object({
       mediaUrl: z.string().url(),
       mediaType: z.string().transform(val => val.toUpperCase()).pipe(z.enum(["IMAGE", "VIDEO"])),
       backgroundColor: z.string().optional(),
@@ -104,7 +104,7 @@ const schemas = {
         scale: z.number().optional(),
       }).optional(),
     }),
-    media_status: z.object({      
+    media_status: z.object({
       creation_id: z.string(),
     }),
     create_comment: z.object({
@@ -194,7 +194,7 @@ const TOOL_DEFINITIONS = [
     description: "Cria um container de mídia para postagem no Instagram",
     inputSchema: {
       type: "object",
-      properties: {       
+      properties: {
         imageUrl: { type: "string", description: "URL da imagem a ser postada" },
         caption: { type: "string", description: "Legenda da foto" },
         altText: { type: "string", description: "Texto alternativo para acessibilidade (opcional)" },
@@ -207,7 +207,7 @@ const TOOL_DEFINITIONS = [
     description: "Publica um container de mídia no Instagram",
     inputSchema: {
       type: "object",
-      properties: {       
+      properties: {
         creation_id: { type: "string", description: "ID do container de mídia a ser publicado" },
       },
       required: ["creation_id"],
@@ -218,8 +218,8 @@ const TOOL_DEFINITIONS = [
     description: "Cria e publica um carrossel no Instagram (até 10 imagens)",
     inputSchema: {
       type: "object",
-      properties: {       
-        items: { 
+      properties: {
+        items: {
           type: "array",
           items: { type: "string" },
           description: "Lista de URLs das imagens (máximo 10)",
@@ -227,7 +227,7 @@ const TOOL_DEFINITIONS = [
           maxItems: 10
         },
         caption: { type: "string", description: "Legenda do carrossel" },
-        collaborators: { 
+        collaborators: {
           type: "array",
           items: { type: "string" },
           description: "Lista de usernames dos colaboradores"
@@ -253,7 +253,7 @@ const TOOL_DEFINITIONS = [
     description: "Cria e publica um Reel no Instagram (substitui a funcionalidade antiga de vídeo)",
     inputSchema: {
       type: "object",
-      properties: {       
+      properties: {
         videoUrl: { type: "string", description: "URL do vídeo" },
         caption: { type: "string", description: "Legenda do Reel" },
         coverUrl: { type: "string", description: "URL da imagem de capa (opcional)" },
@@ -267,10 +267,10 @@ const TOOL_DEFINITIONS = [
     description: "Cria e publica um Story no Instagram (apenas contas empresariais)",
     inputSchema: {
       type: "object",
-      properties: {       
+      properties: {
         mediaUrl: { type: "string", description: "URL da mídia (imagem ou vídeo)" },
-        mediaType: { 
-          type: "string", 
+        mediaType: {
+          type: "string",
           enum: ["IMAGE", "VIDEO"],
           description: "Tipo de mídia"
         },
@@ -294,7 +294,7 @@ const TOOL_DEFINITIONS = [
     description: "Verifica o status de uma mídia no Instagram",
     inputSchema: {
       type: "object",
-      properties: {       
+      properties: {
         creation_id: { type: "string", description: "ID do container de mídia" },
       },
       required: ["creation_id"],
@@ -409,7 +409,7 @@ const TOOL_DEFINITIONS = [
     inputSchema: {
       type: "object",
       properties: {
-        metrics: { 
+        metrics: {
           type: "array",
           items: { type: "string" },
           description: "Lista de métricas a serem coletadas"
@@ -536,7 +536,7 @@ const toolHandlers = {
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v21.0";
@@ -591,9 +591,9 @@ const toolHandlers = {
           data: error.config?.data
         }
       });
-      
+
       let errorMessage = `Erro ao criar container de mídia: ${error.message}`;
-      
+
       // Tratamento específico para erro 400
       if (error.response?.status === 400) {
         const errorData = error.response.data?.error;
@@ -607,7 +607,7 @@ const toolHandlers = {
           }
         }
       }
-      
+
       return {
         content: [{
           type: "text",
@@ -622,7 +622,7 @@ const toolHandlers = {
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v21.0";
@@ -664,9 +664,9 @@ const toolHandlers = {
           data: error.config?.data
         }
       });
-      
+
       let errorMessage = `Erro ao publicar mídia: ${error.message}`;
-      
+
       // Tratamento específico para erro 400
       if (error.response?.status === 400) {
         const errorData = error.response.data?.error;
@@ -680,7 +680,7 @@ const toolHandlers = {
           }
         }
       }
-      
+
       return {
         content: [{
           type: "text",
@@ -695,7 +695,7 @@ const toolHandlers = {
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v21.0";
@@ -706,7 +706,7 @@ const toolHandlers = {
       const itemIds = [];
       const itemStatuses = [];
       let hasVideo = false;
-      
+
       // Primeiro, verificar se há vídeos no carrossel
       for (const imageUrl of parsed.items) {
         const isVideo = imageUrl.match(/\.(mp4|mov|avi|wmv|flv|mkv)$/i);
@@ -723,12 +723,12 @@ const toolHandlers = {
       for (const imageUrl of parsed.items) {
         const createItemUrl = `${baseUrl}/${apiVersion}/${igUserId}/media`;
         console.log("\n📤 Criando container para item:", imageUrl);
-        
+
         try {
           // Determinar o tipo de mídia baseado na extensão do arquivo
           const isVideo = imageUrl.match(/\.(mp4|mov|avi|wmv|flv|mkv)$/i);
           const mediaType = isVideo ? "VIDEO" : "IMAGE";
-          
+
           console.log("📝 Tipo de mídia detectado:", mediaType);
 
           const itemData = {
@@ -761,7 +761,7 @@ const toolHandlers = {
           if (!itemResponse.data.id) {
             throw new Error(`Falha ao criar container para item: ${imageUrl}`);
           }
-          
+
           const itemId = itemResponse.data.id;
           itemIds.push(itemId);
           itemStatuses.push({ id: itemId, isVideo, status: "CREATED" });
@@ -779,7 +779,7 @@ const toolHandlers = {
               const itemStatusUrl = `${baseUrl}/${apiVersion}/${itemId}`;
               console.log(`\n🔄 Verificação ${itemAttempts + 1}/${maxItemAttempts} do container do vídeo`);
               console.log("URL:", itemStatusUrl);
-              
+
               try {
                 const itemStatusResponse = await axios.get(itemStatusUrl, {
                   params: {
@@ -846,7 +846,7 @@ const toolHandlers = {
       const createCarouselUrl = `${baseUrl}/${apiVersion}/${igUserId}/media`;
       console.log("\n📤 Criando container do carrossel...");
       console.log("Items:", itemIds);
-      
+
       try {
         const carouselData = {
           media_type: "CAROUSEL",
@@ -893,7 +893,7 @@ const toolHandlers = {
           const statusUrl = `${baseUrl}/${apiVersion}/${containerId}`;
           console.log(`\n🔄 Verificação ${attempts + 1}/${maxAttempts}`);
           console.log("URL:", statusUrl);
-          
+
           try {
             const statusResponse = await axios.get(statusUrl, {
               params: {
@@ -944,7 +944,7 @@ const toolHandlers = {
           creation_id: containerId,
           access_token: accessToken
         });
-        
+
         try {
           const publishResponse = await axios.post(publishUrl, {
             creation_id: containerId,
@@ -956,7 +956,7 @@ const toolHandlers = {
           if (publishResponse.data.id) {
             console.log("🎉 Carrossel publicado com sucesso!");
             console.log("📝 ID da publicação:", publishResponse.data.id);
-            
+
             // Aguardar 1 segundo após a publicação
             console.log("⏳ Aguardando 1 segundo para garantir que a publicação seja processada...");
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -1007,7 +1007,7 @@ const toolHandlers = {
           if (publishError.response?.data?.error) {
             errorMessage += `\nDetalhes do erro: ${JSON.stringify(publishError.response.data.error, null, 2)}`;
           }
-          
+
           // Se o erro for 400, pode ser que a publicação já tenha sido feita
           if (publishError.response?.status === 400) {
             console.log("⚠️ Erro 400 detectado - possível que a publicação já tenha sido feita");
@@ -1018,7 +1018,7 @@ const toolHandlers = {
               }],
             };
           }
-          
+
           return {
             content: [{
               type: "text",
@@ -1041,12 +1041,12 @@ const toolHandlers = {
         status: error.response?.status,
         headers: error.response?.headers
       });
-      
+
       let errorMessage = `Erro ao processar carrossel: ${error.message}`;
       if (error.response?.data?.error) {
         errorMessage += `\nDetalhes: ${JSON.stringify(error.response.data.error, null, 2)}`;
       }
-      
+
       return {
         content: [{
           type: "text",
@@ -1061,7 +1061,7 @@ const toolHandlers = {
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v21.0";
@@ -1117,7 +1117,7 @@ const toolHandlers = {
         const statusUrl = `${baseUrl}/${apiVersion}/${containerId}`;
         console.log(`\n🔄 Verificação ${attempts + 1}/${maxAttempts}`);
         console.log("URL:", statusUrl);
-        
+
         try {
           const statusResponse = await axios.get(statusUrl, {
             params: {
@@ -1168,7 +1168,7 @@ const toolHandlers = {
         creation_id: containerId,
         access_token: accessToken
       });
-      
+
       try {
         const publishResponse = await axios.post(publishUrl, {
           creation_id: containerId,
@@ -1214,7 +1214,7 @@ const toolHandlers = {
         if (publishError.response?.data?.error) {
           errorMessage += `\nDetalhes do erro: ${JSON.stringify(publishError.response.data.error, null, 2)}`;
         }
-        
+
         return {
           content: [{
             type: "text",
@@ -1229,12 +1229,12 @@ const toolHandlers = {
         status: error.response?.status,
         headers: error.response?.headers
       });
-      
+
       let errorMessage = `Erro ao processar Reel: ${error.message}`;
       if (error.response?.data?.error) {
         errorMessage += `\nDetalhes: ${JSON.stringify(error.response.data.error, null, 2)}`;
       }
-      
+
       return {
         content: [{
           type: "text",
@@ -1249,7 +1249,7 @@ const toolHandlers = {
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v21.0";
@@ -1260,7 +1260,7 @@ const toolHandlers = {
       const createUrl = `${baseUrl}/${apiVersion}/${igUserId}/media`;
       console.log("\n📤 Criando container do Story...");
       console.log("URL:", createUrl);
-      
+
       const createData = {
         media_type: "STORIES",
         access_token: accessToken
@@ -1309,7 +1309,7 @@ const toolHandlers = {
           const statusUrl = `${baseUrl}/${apiVersion}/${containerId}`;
           console.log(`\n🔄 Verificação ${attempts + 1}/${maxAttempts}`);
           console.log("URL:", statusUrl);
-          
+
           try {
             const statusResponse = await axios.get(statusUrl, {
               params: {
@@ -1377,7 +1377,7 @@ const toolHandlers = {
         creation_id: containerId,
         access_token: accessToken
       });
-      
+
       try {
         const publishResponse = await axios.post(publishUrl, {
           creation_id: containerId,
@@ -1434,7 +1434,7 @@ const toolHandlers = {
         if (publishError.response?.data?.error) {
           errorMessage += `\nDetalhes do erro: ${JSON.stringify(publishError.response.data.error, null, 2)}`;
         }
-        
+
         return {
           content: [{
             type: "text",
@@ -1449,12 +1449,12 @@ const toolHandlers = {
         status: error.response?.status,
         headers: error.response?.headers
       });
-      
+
       let errorMessage = `Erro ao processar Story: ${error.message}`;
       if (error.response?.data?.error) {
         errorMessage += `\nDetalhes: ${JSON.stringify(error.response.data.error, null, 2)}`;
       }
-      
+
       return {
         content: [{
           type: "text",
@@ -1469,7 +1469,7 @@ const toolHandlers = {
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v21.0";
@@ -1479,7 +1479,7 @@ const toolHandlers = {
       const url = `${baseUrl}/${apiVersion}/${parsed.creation_id}`;
       console.log("\n🔄 Verificando status da mídia...");
       console.log("URL:", url);
-      
+
       const response = await axios.get(url, {
         params: {
           fields: "status_code",
@@ -1501,12 +1501,12 @@ const toolHandlers = {
         response: error.response?.data,
         status: error.response?.status
       });
-      
+
       let errorMessage = `Erro ao verificar status: ${error.message}`;
       if (error.response?.data?.error) {
         errorMessage += `\nDetalhes: ${JSON.stringify(error.response.data.error, null, 2)}`;
       }
-      
+
       return {
         content: [{
           type: "text",
@@ -1521,7 +1521,7 @@ const toolHandlers = {
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v21.0";
@@ -1555,12 +1555,12 @@ const toolHandlers = {
         response: error.response?.data,
         status: error.response?.status
       });
-      
+
       let errorMessage = `Erro ao criar comentário: ${error.message}`;
       if (error.response?.data?.error) {
         errorMessage += `\nDetalhes: ${JSON.stringify(error.response.data.error, null, 2)}`;
       }
-      
+
       return {
         content: [{
           type: "text",
@@ -1575,7 +1575,7 @@ const toolHandlers = {
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v21.0";
@@ -1585,7 +1585,7 @@ const toolHandlers = {
       const url = `${baseUrl}/${apiVersion}/${parsed.media_id}`;
       console.log("\n📖 Obtendo comentários da publicação...");
       console.log("URL:", url);
-      
+
       const response = await axios.get(url, {
         params: {
           fields: "comments",
@@ -1604,7 +1604,7 @@ const toolHandlers = {
         };
       }
 
-      const commentsText = response.data.comments.data.map(comment => 
+      const commentsText = response.data.comments.data.map(comment =>
         `- ${comment.text} (${new Date(comment.timestamp).toLocaleString()})`
       ).join('\n');
 
@@ -1620,12 +1620,12 @@ const toolHandlers = {
         response: error.response?.data,
         status: error.response?.status
       });
-      
+
       let errorMessage = `Erro ao obter comentários: ${error.message}`;
       if (error.response?.data?.error) {
         errorMessage += `\nDetalhes: ${JSON.stringify(error.response.data.error, null, 2)}`;
       }
-      
+
       return {
         content: [{
           type: "text",
@@ -1640,7 +1640,7 @@ const toolHandlers = {
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v21.0";
@@ -1674,12 +1674,12 @@ const toolHandlers = {
         response: error.response?.data,
         status: error.response?.status
       });
-      
+
       let errorMessage = `Erro ao criar resposta: ${error.message}`;
       if (error.response?.data?.error) {
         errorMessage += `\nDetalhes: ${JSON.stringify(error.response.data.error, null, 2)}`;
       }
-      
+
       return {
         content: [{
           type: "text",
@@ -1694,7 +1694,7 @@ const toolHandlers = {
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v21.0";
@@ -1704,7 +1704,7 @@ const toolHandlers = {
       const url = `${baseUrl}/${apiVersion}/${parsed.comment_id}/replies`;
       console.log("\n📖 Obtendo respostas ao comentário...");
       console.log("URL:", url);
-      
+
       const response = await axios.get(url, {
         params: {
           access_token: accessToken
@@ -1722,7 +1722,7 @@ const toolHandlers = {
         };
       }
 
-      const repliesText = response.data.data.map(reply => 
+      const repliesText = response.data.data.map(reply =>
         `- ${reply.text} (${new Date(reply.timestamp).toLocaleString()})`
       ).join('\n');
 
@@ -1738,12 +1738,12 @@ const toolHandlers = {
         response: error.response?.data,
         status: error.response?.status
       });
-      
+
       let errorMessage = `Erro ao obter respostas: ${error.message}`;
       if (error.response?.data?.error) {
         errorMessage += `\nDetalhes: ${JSON.stringify(error.response.data.error, null, 2)}`;
       }
-      
+
       return {
         content: [{
           type: "text",
@@ -1758,7 +1758,7 @@ const toolHandlers = {
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v21.0";
@@ -1790,12 +1790,12 @@ const toolHandlers = {
         response: error.response?.data,
         status: error.response?.status
       });
-      
+
       let errorMessage = `Erro ao ocultar comentário: ${error.message}`;
       if (error.response?.data?.error) {
         errorMessage += `\nDetalhes: ${JSON.stringify(error.response.data.error, null, 2)}`;
       }
-      
+
       return {
         content: [{
           type: "text",
@@ -1810,7 +1810,7 @@ const toolHandlers = {
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_TOKEN:", process.env.INSTAGRAM_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_TOKEN;
     const apiVersion = "v21.0";
@@ -1854,12 +1854,12 @@ const toolHandlers = {
         response: error.response?.data,
         status: error.response?.status
       });
-      
+
       let errorMessage = `Erro ao enviar resposta privada: ${error.message}`;
       if (error.response?.data?.error) {
         errorMessage += `\nDetalhes: ${JSON.stringify(error.response.data.error, null, 2)}`;
       }
-      
+
       return {
         content: [{
           type: "text",
@@ -1874,7 +1874,7 @@ const toolHandlers = {
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v21.0";
@@ -1884,7 +1884,7 @@ const toolHandlers = {
       const url = `${baseUrl}/${apiVersion}/${igUserId}`;
       console.log("\n📖 Obtendo IDs das publicações...");
       console.log("URL:", url);
-      
+
       const params = {
         fields: "media",
         access_token: accessToken
@@ -1922,12 +1922,12 @@ const toolHandlers = {
         response: error.response?.data,
         status: error.response?.status
       });
-      
+
       let errorMessage = `Erro ao obter IDs das publicações: ${error.message}`;
       if (error.response?.data?.error) {
         errorMessage += `\nDetalhes: ${JSON.stringify(error.response.data.error, null, 2)}`;
       }
-      
+
       return {
         content: [{
           type: "text",
@@ -1942,7 +1942,7 @@ const toolHandlers = {
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v21.0";
@@ -1952,7 +1952,7 @@ const toolHandlers = {
       const url = `${baseUrl}/${apiVersion}/${parsed.media_id}`;
       console.log("\n📖 Obtendo IDs dos comentários da publicação...");
       console.log("URL:", url);
-      
+
       const response = await axios.get(url, {
         params: {
           fields: "comments{id}",
@@ -1986,12 +1986,12 @@ const toolHandlers = {
         response: error.response?.data,
         status: error.response?.status
       });
-      
+
       let errorMessage = `Erro ao obter IDs dos comentários: ${error.message}`;
       if (error.response?.data?.error) {
         errorMessage += `\nDetalhes: ${JSON.stringify(error.response.data.error, null, 2)}`;
       }
-      
+
       return {
         content: [{
           type: "text",
@@ -2003,7 +2003,7 @@ const toolHandlers = {
   track_hashtag: async (args) => {
     const parsed = schemas.toolInputs.track_hashtag.parse(args);
     console.log("🔍 Tracking hashtag:", parsed.hashtag);
-    
+
     try {
       const response = await axios.get(`${baseUrl}/${apiVersion}/${igUserId}/tags/search`, {
         params: {
@@ -2011,20 +2011,27 @@ const toolHandlers = {
           access_token: accessToken
         }
       });
-      
+
       return {
-        hashtag: parsed.hashtag,
-        data: response.data.data
+        content: [{
+          type: "text",
+          text: `Hashtag monitorada com sucesso: #${parsed.hashtag}\nDados: ${JSON.stringify(response.data.data, null, 2)}`
+        }]
       };
     } catch (error) {
       console.error("❌ Error tracking hashtag:", error);
-      throw error;
+      return {
+        content: [{
+          type: "text",
+          text: `Erro ao monitorar hashtag: ${error.message}\nDetalhes: ${JSON.stringify(error.response?.data || {}, null, 2)}`
+        }]
+      };
     }
   },
-  
+
   user_insights: async (args) => {
     const parsed = schemas.toolInputs.user_insights.parse(args);
-    
+
     try {
       const response = await axios.get(`${baseUrl}/${apiVersion}/${igUserId}/insights`, {
         params: {
@@ -2033,26 +2040,36 @@ const toolHandlers = {
           access_token: accessToken
         }
       });
-      
-      return response.data.data;
+
+      return {
+        content: [{
+          type: "text",
+          text: `Dados de insights obtidos com sucesso!\nMétricas: ${parsed.metrics.join(', ')}\nPeríodo: ${parsed.period || 'padrão'}\nDados: ${JSON.stringify(response.data.data, null, 2)}`
+        }]
+      };
     } catch (error) {
       console.error("❌ Error getting user insights:", error);
-      throw error;
+      return {
+        content: [{
+          type: "text",
+          text: `Erro ao obter insights: ${error.message}\nDetalhes: ${JSON.stringify(error.response?.data || {}, null, 2)}`
+        }]
+      };
     }
   },
-  
+
   send_dm: async (args) => {
     const parsed = schemas.toolInputs.send_dm.parse(args);
-    
+
     try {
       // Verificar se temos o ID do destinatário
       if (!parsed.recipientId) {
         throw new Error("ID do destinatário (IGSID) é obrigatório");
       }
-      
+
       // Construir o objeto de mensagem
       const messageObj = {};
-      
+
       // Adicionar texto se fornecido
       if (parsed.text) {
         // Verificar tamanho do texto (máximo 1000 bytes)
@@ -2062,7 +2079,7 @@ const toolHandlers = {
         }
         messageObj.text = parsed.text;
       }
-      
+
       // Adicionar link se fornecido
       if (parsed.link) {
         // Verificar se é uma URL válida
@@ -2071,7 +2088,7 @@ const toolHandlers = {
         } catch (e) {
           throw new Error("O link fornecido não é uma URL válida");
         }
-        
+
         // Se já tiver texto, adiciona o link ao final
         if (messageObj.text) {
           messageObj.text += "\n" + parsed.link;
@@ -2079,13 +2096,13 @@ const toolHandlers = {
           messageObj.text = parsed.link;
         }
       }
-      
+
       // Adicionar mídia se fornecida
       if (parsed.mediaUrl) {
         if (!parsed.mediaType) {
           throw new Error("mediaType é obrigatório quando mediaUrl é fornecido");
         }
-        
+
         // Verificar tipo de mídia e definir o formato correto
         let attachmentType;
         switch(parsed.mediaType) {
@@ -2113,7 +2130,7 @@ const toolHandlers = {
           default:
             throw new Error("mediaType deve ser 'image', 'video' ou 'audio'");
         }
-        
+
         // Adicionar attachment conforme o tipo de mídia
         messageObj.attachment = {
           type: attachmentType,
@@ -2122,25 +2139,25 @@ const toolHandlers = {
           }
         };
       }
-      
+
       // Verificar se há conteúdo para enviar
       if (Object.keys(messageObj).length === 0) {
         throw new Error("É necessário fornecer texto, link ou mídia para enviar");
       }
-      
+
       // Construir payload completo conforme documentação
       const payload = {
         recipient: { id: parsed.recipientId },
         message: messageObj
       };
-      
+
       console.log("📤 Enviando mensagem para:", parsed.recipientId);
       console.log("📝 Conteúdo:", JSON.stringify(messageObj, null, 2));
-      
+
       // Fazer requisição à API do Instagram conforme documentação
       const url = `${baseUrl}/${apiVersion}/${igUserId}/messages`;
       console.log("🔗 URL da API:", url);
-      
+
       const response = await axios({
         method: 'post',
         url: url,
@@ -2150,14 +2167,15 @@ const toolHandlers = {
         },
         data: payload
       });
-      
+
       console.log("✅ Mensagem enviada com sucesso!");
       console.log("📊 Resposta da API:", response.data);
-      
+
       return {
-        success: true,
-        messageId: response.data.message_id,
-        recipientId: parsed.recipientId
+        content: [{
+          type: "text",
+          text: `Mensagem enviada com sucesso!\nID da mensagem: ${response.data.message_id}\nID do destinatário: ${parsed.recipientId}`
+        }]
       };
     } catch (error) {
       console.error("❌ Erro ao enviar mensagem:", {
@@ -2165,18 +2183,19 @@ const toolHandlers = {
         response: error.response?.data,
         status: error.response?.status
       });
-      
+
       return {
-        success: false,
-        error: error.message,
-        details: error.response?.data
+        content: [{
+          type: "text",
+          text: `Erro ao enviar mensagem: ${error.message}\nDetalhes: ${JSON.stringify(error.response?.data || {}, null, 2)}`
+        }]
       };
     }
   },
-  
+
   schedule_post: async (args) => {
     const parsed = schemas.toolInputs.schedule_post.parse(args);
-    
+
     try {
       // First create media container
       const createResponse = await axios.post(`${baseUrl}/${apiVersion}/${igUserId}/media`, {
@@ -2185,21 +2204,27 @@ const toolHandlers = {
         is_carousel_item: false,
         scheduled_publish_time: Math.floor(new Date(parsed.publishTime).getTime() / 1000)
       }, { params: { access_token: accessToken } });
-      
-      return { 
-        scheduled: true, 
-        mediaId: createResponse.data.id,
-        publishTime: parsed.publishTime 
+
+      return {
+        content: [{
+          type: "text",
+          text: `Post agendado com sucesso!\nID da mídia: ${createResponse.data.id}\nData de publicação: ${parsed.publishTime}`
+        }]
       };
     } catch (error) {
       console.error("❌ Error scheduling post:", error);
-      throw error;
+      return {
+        content: [{
+          type: "text",
+          text: `Erro ao agendar post: ${error.message}\nDetalhes: ${JSON.stringify(error.response?.data || {}, null, 2)}`
+        }]
+      };
     }
   },
-  
+
   post_analytics: async (args) => {
     const parsed = schemas.toolInputs.post_analytics.parse(args);
-    
+
     try {
       const response = await axios.get(`${baseUrl}/${apiVersion}/${parsed.mediaId}/insights`, {
         params: {
@@ -2207,11 +2232,21 @@ const toolHandlers = {
           access_token: accessToken
         }
       });
-      
-      return response.data.data;
+
+      return {
+        content: [{
+          type: "text",
+          text: `Dados analíticos obtidos com sucesso!\n${JSON.stringify(response.data.data, null, 2)}`
+        }]
+      };
     } catch (error) {
       console.error("❌ Error getting post analytics:", error);
-      throw error;
+      return {
+        content: [{
+          type: "text",
+          text: `Erro ao obter dados analíticos: ${error.message}\nDetalhes: ${JSON.stringify(error.response?.data || {}, null, 2)}`
+        }]
+      };
     }
   },
   send_image: async (args) => {
@@ -2219,7 +2254,7 @@ const toolHandlers = {
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v22.0";
@@ -2232,12 +2267,12 @@ const toolHandlers = {
       } catch (e) {
         throw new Error("URL da imagem inválido");
       }
-      
+
       // Verificar formato da imagem
       if (!parsed.imageUrl.match(/\.(png|jpe?g|gif)$/i)) {
         console.warn("⚠️ Aviso: URL da imagem não parece ter um formato suportado (png, jpeg, gif)");
       }
-      
+
       // Construir o payload da mensagem
       const messageObj = {
         attachment: {
@@ -2247,7 +2282,7 @@ const toolHandlers = {
           }
         }
       };
-      
+
       // Adicionar caption se fornecido
       if (parsed.caption) {
         // Enviar em uma mensagem separada para garantir compatibilidade
@@ -2256,7 +2291,7 @@ const toolHandlers = {
             recipient: { id: parsed.recipientId },
             message: { text: parsed.caption }
           };
-          
+
           await axios({
             method: 'post',
             url: `${baseUrl}/${apiVersion}/${igUserId}/messages`,
@@ -2266,22 +2301,22 @@ const toolHandlers = {
             },
             data: captionPayload
           });
-          
+
           console.log("✅ Legenda enviada com sucesso!");
         } catch (captionError) {
           console.warn("⚠️ Erro ao enviar legenda:", captionError.message);
         }
       }
-      
+
       // Construir payload completo
       const payload = {
         recipient: { id: parsed.recipientId },
         message: messageObj
       };
-      
+
       console.log("📤 Enviando imagem para:", parsed.recipientId);
       console.log("🖼️ URL da imagem:", parsed.imageUrl);
-      
+
       // Fazer requisição à API do Instagram
       const url = `${baseUrl}/${apiVersion}/${igUserId}/messages`;
       const response = await axios({
@@ -2293,12 +2328,13 @@ const toolHandlers = {
         },
         data: payload
       });
-      
+
       console.log("✅ Imagem enviada com sucesso!");
       return {
-        success: true,
-        messageId: response.data.message_id,
-        recipientId: parsed.recipientId
+        content: [{
+          type: "text",
+          text: `Imagem enviada com sucesso!\nID da mensagem: ${response.data.message_id}\nID do destinatário: ${parsed.recipientId}`
+        }]
       };
     } catch (error) {
       console.error("❌ Erro ao enviar imagem:", {
@@ -2306,21 +2342,22 @@ const toolHandlers = {
         response: error.response?.data,
         status: error.response?.status
       });
-      
+
       return {
-        success: false,
-        error: error.message,
-        details: error.response?.data
+        content: [{
+          type: "text",
+          text: `Erro ao enviar imagem: ${error.message}\nDetalhes: ${JSON.stringify(error.response?.data || {}, null, 2)}`
+        }]
       };
     }
   },
-  
+
   send_media: async (args) => {
     const parsed = schemas.toolInputs.send_media.parse(args);
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v22.0";
@@ -2333,7 +2370,7 @@ const toolHandlers = {
       } catch (e) {
         throw new Error("URL da mídia inválido");
       }
-      
+
       // Verificar tipo de mídia e formato
       if (parsed.mediaType === "audio") {
         if (!parsed.mediaUrl.match(/\.(aac|m4a|wav|mp4)$/i)) {
@@ -2346,7 +2383,7 @@ const toolHandlers = {
       } else {
         throw new Error("Tipo de mídia deve ser 'audio' ou 'video'");
       }
-      
+
       // Construir o payload da mensagem
       const messageObj = {
         attachment: {
@@ -2356,7 +2393,7 @@ const toolHandlers = {
           }
         }
       };
-      
+
       // Adicionar caption se fornecido
       if (parsed.caption) {
         // Enviar em uma mensagem separada para garantir compatibilidade
@@ -2365,7 +2402,7 @@ const toolHandlers = {
             recipient: { id: parsed.recipientId },
             message: { text: parsed.caption }
           };
-          
+
           await axios({
             method: 'post',
             url: `${baseUrl}/${apiVersion}/${igUserId}/messages`,
@@ -2375,22 +2412,22 @@ const toolHandlers = {
             },
             data: captionPayload
           });
-          
+
           console.log("✅ Legenda enviada com sucesso!");
         } catch (captionError) {
           console.warn("⚠️ Erro ao enviar legenda:", captionError.message);
         }
       }
-      
+
       // Construir payload completo
       const payload = {
         recipient: { id: parsed.recipientId },
         message: messageObj
       };
-      
+
       console.log(`📤 Enviando ${parsed.mediaType === "audio" ? "áudio" : "vídeo"} para:`, parsed.recipientId);
       console.log("🔗 URL da mídia:", parsed.mediaUrl);
-      
+
       // Fazer requisição à API do Instagram
       const url = `${baseUrl}/${apiVersion}/${igUserId}/messages`;
       const response = await axios({
@@ -2402,12 +2439,13 @@ const toolHandlers = {
         },
         data: payload
       });
-      
+
       console.log(`✅ ${parsed.mediaType === "audio" ? "Áudio" : "Vídeo"} enviado com sucesso!`);
       return {
-        success: true,
-        messageId: response.data.message_id,
-        recipientId: parsed.recipientId
+        content: [{
+          type: "text",
+          text: `${parsed.mediaType === "audio" ? "Áudio" : "Vídeo"} enviado com sucesso!\nID da mensagem: ${response.data.message_id}\nID do destinatário: ${parsed.recipientId}`
+        }]
       };
     } catch (error) {
       console.error(`❌ Erro ao enviar ${parsed.mediaType === "audio" ? "áudio" : "vídeo"}:`, {
@@ -2415,21 +2453,22 @@ const toolHandlers = {
         response: error.response?.data,
         status: error.response?.status
       });
-      
+
       return {
-        success: false,
-        error: error.message,
-        details: error.response?.data
+        content: [{
+          type: "text",
+          text: `Erro ao enviar ${parsed.mediaType === "audio" ? "áudio" : "vídeo"}: ${error.message}\nDetalhes: ${JSON.stringify(error.response?.data || {}, null, 2)}`
+        }]
       };
     }
   },
-  
+
   send_sticker: async (args) => {
     const parsed = schemas.toolInputs.send_sticker.parse(args);
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v22.0";
@@ -2442,15 +2481,15 @@ const toolHandlers = {
           type: "like_heart"
         }
       };
-      
+
       // Construir payload completo
       const payload = {
         recipient: { id: parsed.recipientId },
         message: messageObj
       };
-      
+
       console.log("📤 Enviando sticker de coração para:", parsed.recipientId);
-      
+
       // Fazer requisição à API do Instagram
       const url = `${baseUrl}/${apiVersion}/${igUserId}/messages`;
       const response = await axios({
@@ -2462,12 +2501,13 @@ const toolHandlers = {
         },
         data: payload
       });
-      
+
       console.log("✅ Sticker enviado com sucesso!");
       return {
-        success: true,
-        messageId: response.data.message_id,
-        recipientId: parsed.recipientId
+        content: [{
+          type: "text",
+          text: `Sticker enviado com sucesso!\nID da mensagem: ${response.data.message_id}\nID do destinatário: ${parsed.recipientId}`
+        }]
       };
     } catch (error) {
       console.error("❌ Erro ao enviar sticker:", {
@@ -2475,21 +2515,22 @@ const toolHandlers = {
         response: error.response?.data,
         status: error.response?.status
       });
-      
+
       return {
-        success: false,
-        error: error.message,
-        details: error.response?.data
+        content: [{
+          type: "text",
+          text: `Erro ao enviar sticker: ${error.message}\nDetalhes: ${JSON.stringify(error.response?.data || {}, null, 2)}`
+        }]
       };
     }
   },
-  
+
   react_message: async (args) => {
     const parsed = schemas.toolInputs.react_message.parse(args);
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v22.0";
@@ -2504,7 +2545,7 @@ const toolHandlers = {
           message_id: parsed.messageId
         }
       };
-      
+
       // Adicionar reaction apenas se for uma ação de reagir
       if (parsed.action === "react") {
         if (!parsed.reaction) {
@@ -2514,9 +2555,9 @@ const toolHandlers = {
           payload.payload.reaction = parsed.reaction;
         }
       }
-      
+
       console.log(`📤 ${parsed.action === "react" ? "Reagindo a" : "Removendo reação de"} mensagem:`, parsed.messageId);
-      
+
       // Fazer requisição à API do Instagram
       const url = `${baseUrl}/${apiVersion}/${igUserId}/messages`;
       const response = await axios({
@@ -2528,13 +2569,13 @@ const toolHandlers = {
         },
         data: payload
       });
-      
+
       console.log(`✅ ${parsed.action === "react" ? "Reação" : "Remoção de reação"} realizada com sucesso!`);
       return {
-        success: true,
-        action: parsed.action,
-        messageId: parsed.messageId,
-        recipientId: parsed.recipientId
+        content: [{
+          type: "text",
+          text: `${parsed.action === "react" ? "Reação" : "Remoção de reação"} realizada com sucesso!\nID da mensagem: ${parsed.messageId}\nID do destinatário: ${parsed.recipientId}`
+        }]
       };
     } catch (error) {
       console.error(`❌ Erro ao ${parsed.action === "react" ? "reagir à" : "remover reação da"} mensagem:`, {
@@ -2542,21 +2583,22 @@ const toolHandlers = {
         response: error.response?.data,
         status: error.response?.status
       });
-      
+
       return {
-        success: false,
-        error: error.message,
-        details: error.response?.data
+        content: [{
+          type: "text",
+          text: `Erro ao ${parsed.action === "react" ? "reagir" : "remover reação"}: ${error.message}\nDetalhes: ${JSON.stringify(error.response?.data || {}, null, 2)}`
+        }]
       };
     }
   },
-  
+
   share_post: async (args) => {
     const parsed = schemas.toolInputs.share_post.parse(args);
     console.log("🔐 Variáveis de ambiente utilizadas:");
     console.log("INSTAGRAM_USER_ID:", process.env.INSTAGRAM_USER_ID);
     console.log("INSTAGRAM_ACCESS_TOKEN:", process.env.INSTAGRAM_ACCESS_TOKEN);
-    
+
     const igUserId = process.env.INSTAGRAM_USER_ID;
     const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
     const apiVersion = "v22.0";
@@ -2572,16 +2614,16 @@ const toolHandlers = {
           }
         }
       };
-      
+
       // Construir payload completo
       const payload = {
         recipient: { id: parsed.recipientId },
         message: messageObj
       };
-      
+
       console.log("📤 Compartilhando post com:", parsed.recipientId);
       console.log("🆔 ID do post:", parsed.postId);
-      
+
       // Fazer requisição à API do Instagram
       const url = `${baseUrl}/${apiVersion}/${igUserId}/messages`;
       const response = await axios({
@@ -2593,13 +2635,13 @@ const toolHandlers = {
         },
         data: payload
       });
-      
+
       console.log("✅ Post compartilhado com sucesso!");
       return {
-        success: true,
-        messageId: response.data.message_id,
-        recipientId: parsed.recipientId,
-        postId: parsed.postId
+        content: [{
+          type: "text",
+          text: `Post compartilhado com sucesso!\nID da mensagem: ${response.data.message_id}\nID do destinatário: ${parsed.recipientId}\nID do post: ${parsed.postId}`
+        }]
       };
     } catch (error) {
       console.error("❌ Erro ao compartilhar post:", {
@@ -2607,11 +2649,12 @@ const toolHandlers = {
         response: error.response?.data,
         status: error.response?.status
       });
-      
+
       return {
-        success: false,
-        error: error.message,
-        details: error.response?.data
+        content: [{
+          type: "text",
+          text: `Erro ao compartilhar post: ${error.message}\nDetalhes: ${JSON.stringify(error.response?.data || {}, null, 2)}`
+        }]
       };
     }
   }
